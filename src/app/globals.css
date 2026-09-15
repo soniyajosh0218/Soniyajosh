@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #fff4f7;
+  --bg-deep: #ffe8ef;
+  --rose: #d46a86;
+  --rose-deep: #b34463;
+  --ink: #4a2433;
+  --ink-soft: #7a4a5a;
+  --gold: #c9a06a;
+  --cream: #fffaf8;
+  --petal: #f7c9d4;
+  --seal: #c23b4f;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-rose: var(--rose);
+  --color-rose-deep: var(--rose-deep);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-gold: var(--gold);
+  --color-cream: var(--cream);
+  --color-petal: var(--petal);
+  --color-seal: var(--seal);
+  --font-display: var(--font-display);
+  --font-script: var(--font-script);
+  --font-body: var(--font-display);
+  --font-sans: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display), "Playfair Display", Georgia, serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--petal);
+  color: var(--ink);
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.font-script {
+  font-family: var(--font-script), cursive;
+}
+
+.paper-grain {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.55), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(212, 106, 134, 0.12), transparent 35%),
+    radial-gradient(circle at 10% 80%, rgba(201, 160, 106, 0.1), transparent 40%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(6deg);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes flame {
+  0%,
+  100% {
+    transform: scaleY(1) translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scaleY(1.12) translateX(1px);
+    opacity: 0.85;
+  }
+}
+
+@keyframes scroll-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+
+.animate-float-soft {
+  animation: float-soft 7s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+
+.animate-flame {
+  animation: flame 0.8s ease-in-out infinite;
+}
+
+.animate-scroll-bounce {
+  animation: scroll-bounce 1.8s ease-in-out infinite;
+}
+
+.moment-frame {
+  transform: rotate(calc(var(--tilt, 0deg) * 0.35));
+  transform-origin: center center;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 640px) {
+  .moment-frame {
+    transform: rotate(var(--tilt, 0deg));
+  }
+}
+
+.group:hover .moment-frame,
+.group:focus-visible .moment-frame {
+  transform: rotate(0deg);
+}
+
+.moment-grid {
+  padding-inline: 0.15rem;
+}
+
+.video-grid {
+  padding-inline: 0.1rem;
+}
+
+@media (min-width: 640px) {
+  .moment-grid {
+    padding-inline: 0.5rem;
+  }
+
+  .video-grid {
+    padding-inline: 0.35rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-soft,
+  .animate-twinkle,
+  .animate-flame,
+  .animate-scroll-bounce {
+    animation: none;
+  }
+
+  .moment-frame {
+    transform: none;
+    transition: none;
+  }
+}

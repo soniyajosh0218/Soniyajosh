@@ -1,0 +1,5 @@
+Jesus blessing PNG
+- public/blessing/jesus-blessing.png (transparent cutout)
+
+Voice
+- birthday-prayer.mp3 — natural Indian English neural voice (Microsoft en-IN-PrabhatNeural)
