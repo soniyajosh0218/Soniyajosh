@@ -19,7 +19,7 @@ export default function HeroSection() {
           </span>
         </h1>
         <p className="mx-auto mt-5 max-w-md px-1 text-sm leading-relaxed text-ink-soft sm:mt-6 md:text-base">
-          From Chaljosh — with every soft heartbeat, every silly laugh, and all the love I saved for
+          From josh — with every soft heartbeat, every silly laugh, and all the love I saved for
           this day.
         </p>
       </motion.div>

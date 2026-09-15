@@ -93,8 +93,10 @@ export default function BlessingSection() {
             src="/blessing/jesus-blessing.png"
             alt="Jesus offering a gentle blessing"
             fill
-            priority={false}
             sizes="(max-width: 640px) 48vw, (max-width: 768px) 200px, 220px"
+            quality={75}
+            loading="lazy"
+            decoding="async"
             className="object-contain drop-shadow-[0_24px_40px_rgba(74,36,51,0.18)]"
           />
         </motion.div>

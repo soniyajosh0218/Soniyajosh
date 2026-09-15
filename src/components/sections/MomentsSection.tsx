@@ -2,8 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { moments, type MomentPhoto } from "@/data/moments";
+
+/** Grid cells are ~300px; keep quality modest so pagespeed stays healthy. */
+const GRID_QUALITY = 68;
+/** Lightbox needs more detail but still well below original multi‑MB files. */
+const LIGHTBOX_QUALITY = 82;
 
 function SparkleIcon({ className }: { className?: string }) {
   return (
@@ -126,14 +132,15 @@ function Polaroid({
               <FrameCorner className="pointer-events-none absolute right-1 bottom-1 z-10 h-5 w-5 rotate-180 text-rose/70 sm:h-6 sm:w-6" />
 
               <span className="relative m-[7px] block aspect-[4/5] overflow-hidden rounded-[2px] sm:m-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={photo.src}
                   alt=""
+                  fill
+                  sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 22vw"
+                  quality={GRID_QUALITY}
                   loading="lazy"
                   decoding="async"
-                  sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 22vw"
-                  className="h-full w-full object-cover transition duration-700 ease-out will-change-transform group-hover:scale-[1.03]"
+                  className="object-cover transition duration-700 ease-out will-change-transform group-hover:scale-[1.03]"
                 />
               </span>
             </span>
@@ -182,6 +189,22 @@ function Lightbox({
       document.body.style.overflow = prev;
     };
   }, [onClose, onPrev, onNext]);
+
+  // Warm only the next/prev optimized variant while the lightbox is open —
+  // never touches the initial page load / LCP path.
+  useEffect(() => {
+    const len = moments.length;
+    const neighbors = [moments[(index + 1) % len], moments[(index - 1 + len) % len]];
+    neighbors.forEach((neighbor) => {
+      const img = new window.Image();
+      const params = new URLSearchParams({
+        url: neighbor.src,
+        w: "1080",
+        q: String(LIGHTBOX_QUALITY),
+      });
+      img.src = `/_next/image?${params.toString()}`;
+    });
+  }, [index]);
 
   return (
     <motion.div
@@ -232,16 +255,25 @@ function Lightbox({
             <FrameCorner className="pointer-events-none absolute right-2 bottom-2 z-10 h-7 w-7 rotate-180 text-rose/60" />
 
             <AnimatePresence mode="wait">
-              <motion.img
+              <motion.div
                 key={photo.src}
-                src={photo.src}
-                alt=""
                 initial={{ opacity: 0.35 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.22 }}
-                className="mx-auto max-h-[min(68dvh,720px)] w-full object-contain sm:max-h-[min(74dvh,800px)]"
-              />
+                className="relative mx-auto w-full"
+              >
+                <Image
+                  src={photo.src}
+                  alt=""
+                  width={1200}
+                  height={1600}
+                  sizes="(max-width: 640px) 94vw, (max-width: 1024px) 48rem, 52rem"
+                  quality={LIGHTBOX_QUALITY}
+                  priority
+                  className="mx-auto h-auto max-h-[min(68dvh,720px)] w-full object-contain sm:max-h-[min(74dvh,800px)]"
+                />
+              </motion.div>
             </AnimatePresence>
           </div>
         </div>

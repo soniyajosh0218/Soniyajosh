@@ -63,7 +63,7 @@ export default function EnvelopeReveal({ onContinue }: Props) {
                   love you.
                 </p>
                 <p className="font-script mt-3 text-right text-[clamp(1.05rem,4vw,1.4rem)] text-rose sm:mt-4">
-                  Always yours, Chaljosh ♥
+                  Always yours, josh ♥
                 </p>
 
                 <div className="mt-3.5 border-t border-rose/15 pt-3.5 sm:mt-4 sm:pt-4">

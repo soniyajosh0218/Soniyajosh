@@ -26,7 +26,7 @@ export default function LetterSection() {
     <section className="relative px-4 py-16 sm:px-5 sm:py-24 md:py-32">
       <div className="mx-auto max-w-2xl">
         <p className="font-script text-center text-2xl text-rose sm:text-3xl">
-          A letter from Chaljosh
+          A letter from josh
         </p>
 
         <article className="mt-8 rounded-[2rem] border border-rose/15 bg-cream/70 p-8 shadow-[0_30px_80px_rgba(180,80,110,0.1)] backdrop-blur-sm md:p-12">
@@ -51,7 +51,7 @@ export default function LetterSection() {
             ))}
           </div>
 
-          <p className="font-script mt-10 text-right text-3xl text-rose">— Chaljosh ♥</p>
+          <p className="font-script mt-10 text-right text-3xl text-rose">— josh ♥</p>
         </article>
       </div>
     </section>

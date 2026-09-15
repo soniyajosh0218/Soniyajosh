@@ -1,9 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-
-const PASSWORD = "mylove";
+import { unlockSite } from "@/app/actions/unlock";
 
 type Props = {
   onUnlock: () => void;
@@ -13,15 +12,22 @@ export default function AuthGate({ onUnlock }: Props) {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [show, setShow] = useState(false);
+  const [pending, startTransition] = useTransition();
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    if (value.trim().toLowerCase() === PASSWORD) {
-      setError("");
-      onUnlock();
-      return;
-    }
-    setError("Not quite… try the hint below");
+    const attempt = value.trim();
+    if (!attempt) return;
+
+    startTransition(async () => {
+      const result = await unlockSite(attempt);
+      if (result.ok) {
+        setError("");
+        onUnlock();
+        return;
+      }
+      setError(result.error);
+    });
   };
 
   return (
@@ -39,7 +45,7 @@ export default function AuthGate({ onUnlock }: Props) {
           Special Space
         </h1>
         <p className="mt-4 text-sm leading-relaxed text-ink-soft md:text-base">
-          A surprise filled with love, memories, and soft little joys — from Chaljosh, only for
+          A surprise filled with love, memories, and soft little joys — from josh, only for
           you.
         </p>
 
@@ -52,6 +58,7 @@ export default function AuthGate({ onUnlock }: Props) {
               placeholder="Enter your password"
               className="w-full rounded-2xl border border-rose/25 bg-cream/80 px-4 py-3.5 pr-14 text-ink shadow-[0_10px_40px_rgba(180,80,110,0.08)] outline-none backdrop-blur-sm transition focus:border-rose focus:ring-4 focus:ring-rose/15"
               autoComplete="off"
+              disabled={pending}
             />
             <button
               type="button"
@@ -78,18 +85,18 @@ export default function AuthGate({ onUnlock }: Props) {
 
           <button
             type="submit"
-            disabled={!value.trim()}
+            disabled={!value.trim() || pending}
             className="w-full rounded-2xl bg-gradient-to-r from-rose to-rose-deep px-4 py-3.5 text-sm font-medium tracking-wide text-white shadow-[0_12px_30px_rgba(179,68,99,0.35)] transition enabled:hover:scale-[1.015] enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-45"
           >
-            Unlock the Surprise
+            {pending ? "Checking…" : "Unlock the Surprise"}
           </button>
         </form>
 
         <p className="mt-5 text-xs text-ink-soft">
-          Hint: two words I feel every day — <span className="text-rose">my ____</span>
+          Hint: our names, no space — <span className="text-rose">josh______</span>
         </p>
         <p className="mt-8 text-xs text-ink-soft/80">
-          Made with love by your boyfriend, Chaljosh — just for you, Soniya
+          Made with love by your boyfriend, josh — just for you, Soniya
         </p>
       </motion.div>
     </section>

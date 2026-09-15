@@ -204,7 +204,7 @@ export default function FinaleSection() {
           }}
           className="font-script mt-7 text-2xl text-rose-deep sm:mt-8 sm:text-3xl md:text-4xl"
         >
-          With all my love, Chaljosh ♥
+          With all my love, josh ♥
         </motion.p>
 
         <motion.button
@@ -231,7 +231,7 @@ export default function FinaleSection() {
           }}
           className="mt-7 text-xs tracking-wide text-ink-soft/70 sm:mt-8"
         >
-          Made with love by Chaljosh · just for Soniya
+          Made with love by josh · just for Soniya
         </motion.p>
       </motion.div>
     </section>
