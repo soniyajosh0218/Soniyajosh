@@ -151,7 +151,7 @@ export default function FinaleSection() {
           May this year love you back,
           <br />
           <span className="bg-gradient-to-r from-rose-deep via-rose to-gold bg-clip-text text-transparent">
-            Soniya
+            Ammu
           </span>
         </motion.h2>
 
@@ -231,7 +231,7 @@ export default function FinaleSection() {
           }}
           className="mt-7 text-xs tracking-wide text-ink-soft/70 sm:mt-8"
         >
-          Made with love by josh · just for Soniya
+          Made with love by josh · just for Ammu
         </motion.p>
       </motion.div>
     </section>

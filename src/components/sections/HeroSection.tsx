@@ -15,7 +15,7 @@ export default function HeroSection() {
           Happy Birthday,
           <br />
           <span className="bg-gradient-to-r from-rose-deep via-rose to-gold bg-clip-text text-transparent">
-            Soniya
+            Ammu
           </span>
         </h1>
         <p className="mx-auto mt-5 max-w-md px-1 text-sm leading-relaxed text-ink-soft sm:mt-6 md:text-base">

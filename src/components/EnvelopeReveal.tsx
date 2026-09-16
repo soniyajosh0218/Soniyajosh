@@ -28,7 +28,7 @@ export default function EnvelopeReveal({ onContinue }: Props) {
       >
         <header className="w-full shrink-0 text-center">
           <p className="font-script text-[clamp(1.45rem,6vw,2.35rem)] leading-tight text-rose-deep">
-            {opened ? "For my favorite person" : "A letter for Soniya"}
+            {opened ? "For my favorite person" : "A letter for Ammu"}
           </p>
           {!opened && (
             <p className="mt-2 text-[clamp(0.75rem,2.8vw,0.9rem)] text-ink-soft">
@@ -48,7 +48,7 @@ export default function EnvelopeReveal({ onContinue }: Props) {
                 className="relative z-10 mx-auto mb-[-1.5rem] w-[93%] rounded-2xl border border-rose/10 bg-cream px-3.5 pt-3.5 pb-10 text-left shadow-[0_16px_40px_rgba(120,60,80,0.14)] sm:mb-[-1.75rem] sm:w-[90%] sm:px-6 sm:pt-5 sm:pb-12"
               >
                 <p className="font-script text-[clamp(1.3rem,5vw,1.85rem)] leading-none text-rose-deep">
-                  Dear Soniya,
+                  Dear Ammu,
                 </p>
                 <p className="mt-2.5 text-[clamp(0.78rem,3.1vw,0.92rem)] leading-relaxed text-ink sm:mt-3">
                   Happy Birthday, my love. You make ordinary days feel like magic, and my heart

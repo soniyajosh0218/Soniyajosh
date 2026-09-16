@@ -40,7 +40,7 @@ export default function AuthGate({ onUnlock }: Props) {
       >
         <p className="font-script text-2xl text-rose sm:text-3xl md:text-4xl">For my girl</p>
         <h1 className="font-display mt-3 text-3xl font-semibold leading-tight text-ink sm:text-4xl md:text-5xl">
-          Welcome to Soniya&apos;s
+          Welcome to Ammu&apos;s
           <br />
           Special Space
         </h1>
@@ -96,7 +96,7 @@ export default function AuthGate({ onUnlock }: Props) {
           Hint: our names, no space — <span className="text-rose">josh______</span>
         </p>
         <p className="mt-8 text-xs text-ink-soft/80">
-          Made with love by your boyfriend, josh — just for you, Soniya
+          Made with love by your boyfriend, josh — just for you, Ammu
         </p>
       </motion.div>
     </section>

@@ -15,8 +15,8 @@ const dancing = Dancing_Script({
 });
 
 export const metadata: Metadata = {
-  title: "Happy Birthday, Soniya 💕",
-  description: "A little world of love made by josh, just for Soniya.",
+  title: "Happy Birthday, Ammu 💕",
+  description: "A little world of love made by josh, just for Ammu.",
 };
 
 export const viewport: Viewport = {

@@ -9,7 +9,7 @@ import MusicButton from "@/components/MusicButton";
 
 type Stage = "auth" | "envelope" | "main";
 
-const AUTH_KEY = "soniya-birthday-unlocked";
+const AUTH_KEY = "ammu-birthday-unlocked";
 
 export default function Home() {
   const [stage, setStage] = useState<Stage>("auth");
@@ -24,7 +24,7 @@ export default function Home() {
   if (!ready) {
     return (
       <main className="paper-grain flex min-h-dvh items-center justify-center">
-        <p className="font-script text-3xl text-rose">Soniya…</p>
+        <p className="font-script text-3xl text-rose">Ammu…</p>
       </main>
     );
   }
