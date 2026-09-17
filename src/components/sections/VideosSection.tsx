@@ -5,6 +5,43 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { videos, type MemoryVideo } from "@/data/videos";
 
+/** Cap concurrent downloads so the first frames paint sooner. */
+const MAX_CONCURRENT_LOADS = 2;
+let activeLoads = 0;
+const loadWaiters: Array<() => void> = [];
+const warmedSrcs = new Set<string>();
+
+function acquireLoadSlot(): Promise<void> {
+  if (activeLoads < MAX_CONCURRENT_LOADS) {
+    activeLoads += 1;
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => {
+    loadWaiters.push(() => {
+      activeLoads += 1;
+      resolve();
+    });
+  });
+}
+
+function releaseLoadSlot() {
+  activeLoads = Math.max(0, activeLoads - 1);
+  const next = loadWaiters.shift();
+  if (next) next();
+}
+
+/** Warm the HTTP cache so the lightbox opens on an already-buffered file. */
+function warmVideoCache(src: string) {
+  if (warmedSrcs.has(src) || typeof document === "undefined") return;
+  warmedSrcs.add(src);
+  const el = document.createElement("video");
+  el.preload = "auto";
+  el.muted = true;
+  el.playsInline = true;
+  el.src = src;
+  el.load();
+}
+
 function Sprockets({ side }: { side: "left" | "right" }) {
   return (
     <span
@@ -32,33 +69,124 @@ function FilmFrame({
   index: number;
   onOpen: (video: MemoryVideo) => void;
 }) {
-  const ref = useRef<HTMLVideoElement>(null);
+  const frameRef = useRef<HTMLButtonElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [near, setNear] = useState(false);
+  const [inView, setInView] = useState(false);
   const [ready, setReady] = useState(false);
 
+  // Only start loading when the frame is near the viewport.
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) return;
+    const node = frameRef.current;
+    if (!node) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          void el.play().catch(() => undefined);
+          setNear(true);
+          setInView(entry.intersectionRatio >= 0.3);
         } else {
-          el.pause();
+          setInView(false);
         }
       },
-      { threshold: 0.35 },
+      { rootMargin: "280px 0px", threshold: [0, 0.3, 0.6] },
     );
 
-    observer.observe(el);
+    observer.observe(node);
     return () => observer.disconnect();
   }, []);
 
+  // Gate downloads through a concurrency slot, then load real media (not metadata-only).
+  useEffect(() => {
+    if (!near) return;
+    const el = videoRef.current;
+    if (!el) return;
+
+    let alive = true;
+    let slotHeld = false;
+    const releaseOnce = () => {
+      if (!slotHeld) return;
+      slotHeld = false;
+      releaseLoadSlot();
+    };
+
+    const onFirstFrame = () => {
+      if (!alive) return;
+      setReady(true);
+      releaseOnce();
+      el.removeEventListener("loadeddata", onFirstFrame);
+      el.removeEventListener("canplay", onFirstFrame);
+      el.removeEventListener("error", onFirstFrame);
+    };
+
+    const watchForFrame = () => {
+      if (el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        onFirstFrame();
+      } else {
+        el.addEventListener("loadeddata", onFirstFrame);
+        el.addEventListener("canplay", onFirstFrame);
+        el.addEventListener("error", onFirstFrame);
+      }
+    };
+
+    // Remount / Strict Mode: src may already be set — just wait for a frame.
+    // Use getAttribute — HTMLVideoElement.src resolves to the page URL when unset.
+    if (el.getAttribute("src")) {
+      watchForFrame();
+      return () => {
+        alive = false;
+        el.removeEventListener("loadeddata", onFirstFrame);
+        el.removeEventListener("canplay", onFirstFrame);
+        el.removeEventListener("error", onFirstFrame);
+      };
+    }
+
+    void (async () => {
+      await acquireLoadSlot();
+      if (!alive) {
+        releaseLoadSlot();
+        return;
+      }
+      slotHeld = true;
+
+      // Same URL as the lightbox so the browser HTTP cache is shared.
+      el.src = video.src;
+      el.preload = "auto";
+      el.load();
+      warmedSrcs.add(video.src);
+      watchForFrame();
+    })();
+
+    return () => {
+      alive = false;
+      el.removeEventListener("loadeddata", onFirstFrame);
+      el.removeEventListener("canplay", onFirstFrame);
+      el.removeEventListener("error", onFirstFrame);
+      releaseOnce();
+    };
+  }, [near, video.src]);
+
+  // Autoplay muted loop only while visible (and motion is allowed).
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el || !ready) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      el.pause();
+      return;
+    }
+
+    if (inView) {
+      void el.play().catch(() => undefined);
+    } else {
+      el.pause();
+    }
+  }, [inView, ready]);
+
   return (
     <motion.button
+      ref={frameRef}
       type="button"
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -71,6 +199,8 @@ function FilmFrame({
       whileHover={{ y: -6 }}
       whileTap={{ scale: 0.985 }}
       onClick={() => onOpen(video)}
+      onPointerEnter={() => warmVideoCache(video.src)}
+      onFocus={() => warmVideoCache(video.src)}
       className={`group relative w-full touch-manipulation text-left outline-none focus-visible:ring-2 focus-visible:ring-rose/40 focus-visible:ring-offset-2 focus-visible:ring-offset-bg ${
         index % 2 === 1 ? "sm:translate-y-6 lg:translate-y-8" : ""
       }`}
@@ -90,13 +220,11 @@ function FilmFrame({
           <span className="relative block overflow-hidden bg-ink/10 shadow-[inset_0_0_0_1px_rgba(74,36,51,0.1)]">
             <span className="relative block aspect-[3/4] sm:aspect-[4/5]">
               <video
-                ref={ref}
-                src={video.src}
+                ref={videoRef}
                 muted
                 loop
                 playsInline
-                preload="metadata"
-                onLoadedData={() => setReady(true)}
+                preload="none"
                 className={`h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04] ${
                   ready ? "opacity-100" : "opacity-0"
                 }`}
@@ -183,6 +311,7 @@ function VideoLightbox({ video, onClose }: { video: MemoryVideo; onClose: () => 
             controls
             playsInline
             autoPlay
+            preload="auto"
             className="max-h-[min(72dvh,720px)] w-full object-contain"
           />
         </div>
